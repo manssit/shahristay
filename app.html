@@ -80,7 +80,9 @@ input:focus { border-color:#17C9A9; }
   </div>
   <div class="done" id="sDone">
     <div class="big">🎉</div><h3>وصلنا طلبك!</h3>
-    <p>سجلناه برقم مرجعي بقاعدة البيانات — وراح نتواصل معك خلال 24 ساعة لإتمام التفاصيل وتوثيق العقد.</p>
+    <p>سجلنا طلبك، وراح نتواصل معك خلال 24 ساعة لإتمام التفاصيل وتوثيق العقد.</p>
+    <a id="waBtn" href="#" target="_blank" style="display:inline-flex;align-items:center;gap:8px;margin-top:12px;background:#25D366;color:#fff;text-decoration:none;font-weight:700;font-size:13.5px;border-radius:12px;padding:12px 22px;">💬 كلمنا واتساب الآن</a>
+    <p style="font-size:10px;color:#8A99A8;margin-top:8px;">تبي رد أسرع؟ الواتساب أسرع قنواتنا</p>
   </div>
 </div>
 
@@ -90,11 +92,12 @@ input:focus { border-color:#17C9A9; }
   var H = { "apikey": K, "Authorization": "Bearer " + K };
   var EMO = { studio:"🏠", apartment:"🏢", villa:"🏡", floor:"🪜", annex:"🚪" };
   var TYPE = { studio:"استوديو", apartment:"شقة", villa:"فيلا", floor:"دور", annex:"ملحق" };
+  var WA = "966504627929"; // واتساب شهري ستاي
   var GRAD = ["linear-gradient(135deg,#0F3A4D,#17C9A9)","linear-gradient(135deg,#12324A,#3EA8FF)","linear-gradient(135deg,#123A2E,#2EE6C3)","linear-gradient(135deg,#1C2E4A,#5EC8B4)"];
   var fmt = function (n) { return Number(n).toLocaleString("en-US"); };
   var cur = null;
 
-  fetch(U + "/rest/v1/listings?select=id,title,unit_type,monthly_price,beds,baths,area_m2,furnished,price_includes,price_excludes,districts(name_ar)&order=monthly_price.asc", { headers: H })
+  fetch(U + "/rest/v1/listings?select=id,title,unit_type,monthly_price,beds,baths,area_m2,furnished,cover_url,price_includes,price_excludes,districts(name_ar)&order=monthly_price.asc", { headers: H })
     .then(function (r) { if (!r.ok) throw 0; return r.json(); })
     .then(function (rows) {
       var area = document.getElementById("area");
@@ -102,7 +105,7 @@ input:focus { border-color:#17C9A9; }
       area.className = "grid"; area.innerHTML = "";
       rows.forEach(function (u, i) {
         var d = document.createElement("div"); d.className = "card";
-        d.innerHTML = '<div class="ph" style="background:' + GRAD[i % 4] + '">' + (EMO[u.unit_type] || "🏠") +
+        d.innerHTML = '<div class="ph" style="background:' + (u.cover_url ? ('url(' + u.cover_url + ') center/cover no-repeat') : GRAD[i % 4]) + '">' + (u.cover_url ? '' : (EMO[u.unit_type] || "🏠")) +
           '<span class="lic">✓ إعلان مرخص</span>' + (u.furnished ? '<span class="furn">مفروشة</span>' : '') + '</div>' +
           '<div class="bd"><div class="nm">' + u.title + '</div>' +
           '<div class="mt">' + (TYPE[u.unit_type] || "") + ' · حي ' + (u.districts ? u.districts.name_ar : "جدة") + ' · ' + u.beds + ' غرفة · ' + (u.area_m2 || "—") + ' م²</div>' +
@@ -148,6 +151,8 @@ input:focus { border-color:#17C9A9; }
       if (!r.ok) throw 0;
       document.getElementById("sForm").style.display = "none";
       document.getElementById("sDone").style.display = "block";
+      var msg = encodeURIComponent("مرحبا شهري ستاي 👋 أرسلت طلب استئجار للوحدة: " + (cur ? cur.title : "") + " وجوالي: " + qP.value);
+      document.getElementById("waBtn").href = "https://wa.me/" + WA + "?text=" + msg;
       qGo.textContent = "أرسل طلب الاستئجار";
     }).catch(function () {
       qGo.disabled = false; qGo.textContent = "أعد المحاولة";
