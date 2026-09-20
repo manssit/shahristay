@@ -71,9 +71,9 @@ input:focus { border-color:#17C9A9; }
     <label>الاسم (اختياري)</label><input id="qName" placeholder="اسمك الكريم">
     <label>رقم الجوال</label><input id="qPhone" inputmode="tel" dir="ltr" style="text-align:right" placeholder="05XXXXXXXX">
     <div class="hint" id="qHint">10 خانات تبدأ بـ05 — أو 9665...+</div>
-    <div style="display:flex;gap:10px">
-      <div style="flex:1"><label>تاريخ السكن</label><input id="qDate" type="date"></div>
-      <div style="flex:1"><label>المدة</label><select id="qMonths"><option value="1">شهر</option><option value="2">شهران</option><option value="3" selected>3 أشهر</option><option value="4">4</option><option value="6">6</option><option value="9">9</option><option value="11">11</option></select></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <div style="flex:1 1 150px;min-width:0"><label>تاريخ السكن</label><input id="qDate" type="date" style="min-width:0"></div>
+      <div style="flex:1 1 120px;min-width:0"><label>المدة</label><select id="qMonths"><option value="1">شهر</option><option value="2">شهران</option><option value="3" selected>3 أشهر</option><option value="4">4</option><option value="6">6</option><option value="9">9</option><option value="11">11 شهرًا</option><option value="12">سنة كاملة (12 شهر)</option></select></div>
     </div>
     <button class="go" id="qGo" disabled>أرسل طلب الاستئجار</button>
     <p style="font-size:10px;color:#8A99A8;margin-top:8px;text-align:center">يوصلك رد خلال 24 ساعة — والعقد يوثق إلكترونيًا</p>
