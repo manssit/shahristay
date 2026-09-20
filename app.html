@@ -79,10 +79,11 @@ input:focus { border-color:#17C9A9; }
     <p style="font-size:10px;color:#8A99A8;margin-top:8px;text-align:center">يوصلك رد خلال 24 ساعة — والعقد يوثق إلكترونيًا</p>
   </div>
   <div class="done" id="sDone">
-    <div class="big">🎉</div><h3>وصلنا طلبك!</h3>
+    <div class="big">🎉</div><h3>وصلنا طلبك!</h3><div id="rqRefBox" style="display:inline-block;background:#F1FAF7;border:1px dashed #17C9A9;border-radius:10px;padding:5px 16px;margin:4px 0 2px;font-weight:700;letter-spacing:1px;font-size:14px"></div>
     <p>سجلنا طلبك، وراح نتواصل معك خلال 24 ساعة لإتمام التفاصيل وتوثيق العقد.</p>
     <a id="waBtn" href="#" target="_blank" style="display:inline-flex;align-items:center;gap:8px;margin-top:12px;background:#25D366;color:#fff;text-decoration:none;font-weight:700;font-size:13.5px;border-radius:12px;padding:12px 22px;">💬 كلمنا واتساب الآن</a>
     <p style="font-size:10px;color:#8A99A8;margin-top:8px;">تبي رد أسرع؟ الواتساب أسرع قنواتنا</p>
+    <button id="pdfBtn" style="margin-top:6px;background:#0D1B2A;color:#fff;border:none;font-family:inherit;font-weight:700;font-size:12.5px;border-radius:12px;padding:11px 20px;cursor:pointer">🧾 حمّل إيصال الطلب (PDF)</button>
   </div>
 </div>
 
@@ -95,7 +96,7 @@ input:focus { border-color:#17C9A9; }
   var WA = "966504627929"; // واتساب شهري ستاي
   var GRAD = ["linear-gradient(135deg,#0F3A4D,#17C9A9)","linear-gradient(135deg,#12324A,#3EA8FF)","linear-gradient(135deg,#123A2E,#2EE6C3)","linear-gradient(135deg,#1C2E4A,#5EC8B4)"];
   var fmt = function (n) { return Number(n).toLocaleString("en-US"); };
-  var cur = null;
+  var cur = null; var rqRef = "";
 
   fetch(U + "/rest/v1/listings?select=id,title,unit_type,monthly_price,beds,baths,area_m2,furnished,cover_url,price_includes,price_excludes,districts(name_ar)&order=monthly_price.asc", { headers: H })
     .then(function (r) { if (!r.ok) throw 0; return r.json(); })
@@ -146,12 +147,28 @@ input:focus { border-color:#17C9A9; }
     fetch(U + "/rest/v1/unit_inquiries", {
       method: "POST",
       headers: { "apikey": K, "Authorization": "Bearer " + K, "Content-Type": "application/json", "Prefer": "return=minimal" },
-      body: JSON.stringify({ listing_id: cur.id, name: document.getElementById("qName").value.trim() || null, phone: qP.value, move_in: document.getElementById("qDate").value || null, months: +document.getElementById("qMonths").value })
+      body: JSON.stringify({ listing_id: cur.id, name: document.getElementById("qName").value.trim() || null, phone: qP.value, move_in: document.getElementById("qDate").value || null, months: +document.getElementById("qMonths").value, note: "ref:" + (rqRef = "RQ-" + Date.now().toString().slice(-6)) })
     }).then(function (r) {
       if (!r.ok) throw 0;
       document.getElementById("sForm").style.display = "none";
       document.getElementById("sDone").style.display = "block";
       var msg = encodeURIComponent("مرحبا شهري ستاي 👋 أرسلت طلب استئجار للوحدة: " + (cur ? cur.title : "") + " وجوالي: " + qP.value);
+      document.getElementById("rqRefBox").textContent = rqRef;
+      document.getElementById("pdfBtn").onclick = function () {
+        var w = window.open("", "_blank");
+        w.document.write('<html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>إيصال طلب استئجار</title><style>body{font-family:\'IBM Plex Sans Arabic\',Tahoma;padding:34px;color:#13202E}h1{font-size:20px;color:#0D1B2A;border-bottom:3px solid #17C9A9;padding-bottom:8px}table{width:100%;border-collapse:collapse;margin-top:14px}td{padding:9px 6px;border-bottom:1px solid #E5EEEA;font-size:13.5px}td:first-child{color:#5B6B7A;width:38%}.f{margin-top:26px;font-size:11px;color:#8A99A8;line-height:1.9}</style></head><body>'
+        + '<h1>شهري ستاي | SHAHRI STAY · إيصال طلب استئجار</h1><table>'
+        + '<tr><td>رقم الطلب</td><td><b>' + rqRef + '</b></td></tr>'
+        + '<tr><td>الوحدة</td><td>' + cur.title + '</td></tr>'
+        + '<tr><td>السعر الشهري</td><td>' + fmt(cur.monthly_price) + ' ريال</td></tr>'
+        + '<tr><td>تاريخ السكن</td><td>' + (document.getElementById("qDate").value || "غير محدد") + '</td></tr>'
+        + '<tr><td>المدة</td><td>' + document.getElementById("qMonths").value + ' شهر</td></tr>'
+        + '<tr><td>الجوال</td><td>' + qP.value + '</td></tr>'
+        + '<tr><td>تاريخ الطلب</td><td>' + new Date().toLocaleDateString("ar-SA") + '</td></tr>'
+        + '</table><p class="f">هذا إيصال استلام طلب وليس عقدًا، نرد خلال 24 ساعة، والعقد يوثق إلكترونيًا عبر إيجار.<br>شهري ستاي · مؤسسة لمعة الألماس التجارية · س.ت 7021499962 · واتساب 0504627929 · shahristay.com</p>'
+        + '<scr' + 'ipt>setTimeout(function(){window.print()},400)</scr' + 'ipt></body></html>');
+        w.document.close();
+      };
       document.getElementById("waBtn").href = "https://wa.me/" + WA + "?text=" + msg;
       qGo.textContent = "أرسل طلب الاستئجار";
     }).catch(function () {
